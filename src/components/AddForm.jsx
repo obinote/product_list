@@ -14,14 +14,14 @@ const AddForm = (props) => {
     sellingPrice: Yup.number("Only number input number").required("Please input product price"),
     stock: Yup.number("Only number input number").required("Please input product stock"),
     productImage: Yup.mixed()
-      .test("is-file-too-big", "File exceeds 120KB", () => {
+      .test("is-file-too-big", "File exceeds 100KB", () => {
         let valid = true;
         const files = fileRef?.current?.files;
         if (files) {
           const fileArr = Array.from(files);
           fileArr.forEach((file) => {
             const size = file.size / 1024;
-            if (size > 120) {
+            if (size > 100) {
               valid = false;
             }
           });

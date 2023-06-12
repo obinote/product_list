@@ -1,9 +1,10 @@
 import { useFormik } from "formik";
 import { useEffect, useRef, useState } from "react";
 import * as Yup from "yup";
+import FormInput from "./form/FormInput";
 
 const AddForm = (props) => {
-  const { onAdd, addMode, productId } = props;
+  const { onAdd, addMode, product } = props;
   const fileRef = useRef(null);
   const [formReady, setFormReady] = useState(false);
 
@@ -69,7 +70,6 @@ const AddForm = (props) => {
   };
 
   const handleChangesNumber = (e) => {
-    console.log(e.target.value);
     if (Number(e.target.value) || !e.target.value) {
       formik.handleChange(e);
     } else {
@@ -80,20 +80,20 @@ const AddForm = (props) => {
     }
   };
 
-  const loadProduct = async (productId) => {
+  const loadProduct = async (product) => {
     await formik.resetForm();
-    console.log(productId);
+    await formik.setFieldValue('product', product.first_name);
     setFormReady(true);
   };
 
   useEffect(() => {
-    if (addMode && !productId) {
+    if (addMode && !product.id) {
       setFormReady(true);
       formik.resetForm();
-    } else if (addMode && productId) {
-      loadProduct(productId);
+    } else if (addMode && product.id) {
+      loadProduct(product);
     }
-  }, [addMode, productId]);
+  }, [addMode, product]);
 
   return (
     <>
@@ -127,27 +127,18 @@ const AddForm = (props) => {
               </button>
               <div className="px-6 py-6 lg:px-8">
                 <h3 className="mb-4 text-xl font-medium text-gray-900 dark:text-white">
-                  {productId ? "Update Product" : "Add New Product"}
+                  {product.id ? "Update Product" : "Add New Product"}
                 </h3>
                 <form className="space-y-6" onSubmit={formik.handleSubmit}>
-                  <div>
-                    <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                      Product Name
-                    </label>
-                    <input
-                      type="text"
-                      name="product"
-                      id="product"
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                      placeholder="Product Name"
-                      autoComplete="off"
-                      value={formik.values.product}
-                      onChange={formik.handleChange}
-                    />
-                    {formik.touched.product && formik.errors.product ? (
-                      <p className="text-sm text-red-400 dark:text-white">{formik.errors.product}</p>
-                    ) : null}
-                  </div>
+                  <FormInput
+                    label="Product Name"
+                    name="product"
+                    isNumber={false}
+                    inputValue={formik.values.product}
+                    handleChanges={formik.handleChange}
+                    errorMessage={formik.touched.product && formik.errors.product ? formik.errors.product : null}
+                  />
+                  
                   <div>
                     <label
                       className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
@@ -170,67 +161,37 @@ const AddForm = (props) => {
                       <p className="text-sm text-red-400 dark:text-white">{formik.errors.productImage}</p>
                     ) : null}
                   </div>
-                  <div>
-                    <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                      Purchase Price
-                    </label>
-                    <input
-                      type="text"
-                      name="purchasePrice"
-                      id="purchasePrice"
-                      placeholder="1234"
-                      autoComplete="off"
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                      value={formik.values.purchasePrice}
-                      onChange={handleChangesNumber}
-                    />
-                    {formik.touched.purchasePrice && formik.errors.purchasePrice ? (
-                      <p className="text-sm text-red-400 dark:text-white">{formik.errors.purchasePrice}</p>
-                    ) : null}
-                  </div>
-                  <div>
-                    <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                      Selling Price
-                    </label>
-                    <input
-                      type="text"
-                      name="sellingPrice"
-                      id="sellingPrice"
-                      placeholder="1234"
-                      autoComplete="off"
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                      value={formik.values.sellingPrice}
-                      onChange={handleChangesNumber}
-                    />
-                    {formik.touched.sellingPrice && formik.errors.sellingPrice ? (
-                      <p className="text-sm text-red-400 dark:text-white">{formik.errors.sellingPrice}</p>
-                    ) : null}
-                  </div>
-                  <div>
-                    <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                      Stock
-                    </label>
-                    <input
-                      type="text"
-                      name="stock"
-                      id="stock"
-                      pattern="[0-9]*"
-                      placeholder="1234"
-                      autoComplete="off"
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                      value={formik.values.stock}
-                      onChange={handleChangesNumber}
-                    />
-                    {formik.touched.stock && formik.errors.stock ? (
-                      <p className="text-sm text-red-400 dark:text-white">{formik.errors.stock}</p>
-                    ) : null}
-                  </div>
+                  
+                  <FormInput
+                    label="Purchase Price"
+                    name="purchasePrice"
+                    isNumber={true}
+                    inputValue={formik.values.purchasePrice}
+                    handleChanges={handleChangesNumber}
+                    errorMessage={formik.touched.purchasePrice && formik.errors.purchasePrice ? formik.errors.purchasePrice : null}
+                  />
+                  <FormInput
+                    label="Selling Price"
+                    name="sellingPrice"
+                    isNumber={true}
+                    inputValue={formik.values.sellingPrice}
+                    handleChanges={handleChangesNumber}
+                    errorMessage={formik.touched.sellingPrice && formik.errors.sellingPrice ? formik.errors.sellingPrice : null}
+                  />
+                  <FormInput
+                    label="Stock"
+                    name="stock"
+                    isNumber={true}
+                    inputValue={formik.values.stock}
+                    handleChanges={handleChangesNumber}
+                    errorMessage={formik.touched.stock && formik.errors.stock ? formik.errors.stock : null}
+                  />
 
                   <button
                     type="submit"
                     className="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                   >
-                    {productId ? "Update" : "Save"}
+                    {product.id ? "Update" : "Save"}
                   </button>
                 </form>
               </div>
